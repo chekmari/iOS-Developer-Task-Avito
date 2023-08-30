@@ -62,7 +62,6 @@ class MainViewController: UIViewController {
                     self.showLoadingState()
                     self.showErrorState()
                 }
-                
                 return
             }
             guard let data = data else {

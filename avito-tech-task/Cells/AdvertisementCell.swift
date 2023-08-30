@@ -1,5 +1,5 @@
 //
-//  ProductCell.swift
+//
 //  avito-tech-task
 //
 //  Created by macbook on 26.08.2023.
@@ -8,18 +8,55 @@
 import UIKit
 
 class ProductCell: UICollectionViewCell {
-    var title: UILabel!
-    var price: UILabel!
-    var location: UILabel!
-    var imageView: UIImageView!
-    var createdDate: UILabel! 
+    private var title: UILabel! = {
+        let title = UILabel()
+        title.font = UIFont.systemFont(ofSize: 14)
+        title.textColor = .black
+        title.numberOfLines = 2
+        title.lineBreakMode = .byTruncatingTail
+        title.translatesAutoresizingMaskIntoConstraints = false
+        return title
+    }()
+    private var price: UILabel! = {
+        let price = UILabel()
+        price.font = UIFont.boldSystemFont(ofSize: 16)
+        price.textColor = .black
+        price.numberOfLines = 1
+        price.textAlignment = .left
+        price.translatesAutoresizingMaskIntoConstraints = false
+        return price
+    }()
+    private var location: UILabel! = {
+        let location = UILabel()
+        location.font = UIFont.systemFont(ofSize: 10)
+        location.textColor = .gray
+        location.numberOfLines = 1
+        location.textAlignment = .left
+        location.translatesAutoresizingMaskIntoConstraints = false
+        return location
+    }()
+    private var imageView: UIImageView! = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 6
+        imageView.clipsToBounds = true
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    private var createdDate: UILabel! = {
+        let createdDate = UILabel()
+        createdDate.font = UIFont.systemFont(ofSize: 10)
+        createdDate.textColor = .gray
+        createdDate.numberOfLines = 1
+        createdDate.textAlignment = .left
+        createdDate.translatesAutoresizingMaskIntoConstraints = false
+        return createdDate
+    }()
     
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        layer.cornerRadius = 6
-        clipsToBounds = true
     }
     
     required init?(coder: NSCoder) {
@@ -35,73 +72,41 @@ class ProductCell: UICollectionViewCell {
 
 extension ProductCell {
     
-    func setupUI() {
-        imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 8
-        
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+    private func setupUI() {
+        layer.cornerRadius = 6
+        addSubview()
+        setupConstraints()
+    }
+    private func addSubview() {
         addSubview(imageView)
-        
+        addSubview(title)
+        addSubview(price)
+        addSubview(location)
+        addSubview(createdDate)
+    }
+    private func setupConstraints() {
         imageView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         imageView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         imageView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
         imageView.heightAnchor.constraint(equalToConstant: 184).isActive = true
         imageView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
         
-        title = UILabel()
-        title.font = UIFont.systemFont(ofSize: 14)
-        title.textColor = .black
-        title.numberOfLines = 2
-        title.lineBreakMode = .byTruncatingTail
-        title.translatesAutoresizingMaskIntoConstraints = false
-        
-        addSubview(title)
-        
         title.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 8).isActive = true
         title.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         title.widthAnchor.constraint(equalToConstant: 160).isActive = true
-        
-        price = UILabel()
-        price.font = UIFont.boldSystemFont(ofSize: 16)
-        price.textColor = .black
-        price.numberOfLines = 1
-        price.textAlignment = .left
-        price.translatesAutoresizingMaskIntoConstraints = false
-        
-        addSubview(price)
-        
+            
         price.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 4).isActive = true
         price.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         price.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        
-        location = UILabel()
-        location.font = UIFont.systemFont(ofSize: 10)
-        location.textColor = .gray
-        location.numberOfLines = 1
-        location.textAlignment = .left
-        location.translatesAutoresizingMaskIntoConstraints = false
-        
-        addSubview(location)
+            
         location.topAnchor.constraint(equalTo: price.bottomAnchor, constant: 4).isActive = true
         location.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         location.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        
-        
-        createdDate = UILabel()
-        createdDate.font = UIFont.systemFont(ofSize: 10)
-        createdDate.textColor = .gray
-        createdDate.numberOfLines = 1
-        createdDate.textAlignment = .left
-        createdDate.translatesAutoresizingMaskIntoConstraints = false
-        
-        addSubview(createdDate)
+            
         createdDate.topAnchor.constraint(equalTo: location.bottomAnchor, constant: 4).isActive = true
         createdDate.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         createdDate.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        
     }
-    
     
     func add(title: String) {
         self.title.text = title
