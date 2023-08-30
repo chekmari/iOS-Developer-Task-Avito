@@ -31,22 +31,18 @@ class AdvertisementDetailViewController: UIViewController {
     
     private var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
-        
         scrollView.alwaysBounceVertical = true
         scrollView.showsVerticalScrollIndicator = true
         scrollView.isDirectionalLockEnabled = true
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        
         return scrollView
     }()
     
     private var imageView: UIImageView = {
         let imageView = UIImageView()
-        
         imageView.backgroundColor = .lightGray
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        
         return imageView
     }()
     
@@ -266,8 +262,8 @@ class AdvertisementDetailViewController: UIViewController {
         contentViewReloadData()
     }
     
-    // TODO: - добавить createdDate
-    func addSubview() {
+    
+    private func addSubview() {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubview(imageView)
@@ -281,7 +277,7 @@ class AdvertisementDetailViewController: UIViewController {
         contentView.addSubview(createdDate)
         
     }
-    func setupConstraints() {
+    private func setupConstraints() {
         scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         scrollView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
         scrollView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
@@ -323,8 +319,6 @@ class AdvertisementDetailViewController: UIViewController {
         createdDate.topAnchor.constraint(equalTo: location.bottomAnchor, constant: 20).isActive = true
         createdDate.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10).isActive = true
     }
-   
-
 }
 
 extension AdvertisementDetailViewController: UIScrollViewDelegate {
@@ -349,15 +343,13 @@ extension AdvertisementDetailViewController {
     private func contentViewReloadData() {
         guard let advertisement = advertisement else {
             return
-            
         }
+        imageView.kf.setImage(with: URL(string: advertisement.imageURL))
         price.text = advertisement.price
         titleText.text = advertisement.title
         descriptionLabel.text = advertisement.description
         userLabel.text! += "\(advertisement.phoneNumber ?? "")"
         location.text = "\(advertisement.address ?? "")\n\(advertisement.location)"
         createdDate.text = advertisement.createdDate
-        
-        
     }
 }

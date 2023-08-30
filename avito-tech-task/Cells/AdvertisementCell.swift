@@ -35,7 +35,7 @@ class ProductCell: UICollectionViewCell {
         location.translatesAutoresizingMaskIntoConstraints = false
         return location
     }()
-    private var imageView: UIImageView! = {
+    var imageView: UIImageView! = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 6

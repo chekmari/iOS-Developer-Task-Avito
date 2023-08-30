@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class MainViewController: UIViewController {
     
@@ -33,7 +34,6 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Список товаров"
-        navigationItem.largeTitleDisplayMode = .automatic
         view.backgroundColor = .white
         
         
@@ -50,7 +50,6 @@ class MainViewController: UIViewController {
             showErrorState()
             return
         }
-        
         let request = URLRequest(url: url)
         
         URLSession.shared.dataTask(with: request) { (data, error, response) in
@@ -129,11 +128,11 @@ class MainViewController: UIViewController {
         activityIndicator.stopAnimating()
         collectionView.reloadData()
     }
-    
     func setupCollectionView() {
         collectionView = UICollectionView(frame: .zero,
                                           collectionViewLayout: createLayout())
-        collectionView.register(ProductCell.self, forCellWithReuseIdentifier: "productCell")
+        collectionView.register(ProductCell.self,
+                                forCellWithReuseIdentifier: "productCell")
         collectionView.delegate = self
         collectionView.dataSource = self
         
@@ -145,7 +144,7 @@ class MainViewController: UIViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
     
-    func setupConstaints() {
+    private func setupConstaints() {
         
         
         view.addSubview(activityIndicator)
@@ -161,7 +160,6 @@ class MainViewController: UIViewController {
         activityIndicator.isHidden = true
         errorLabel.isHidden = true
     }
-    
     private func createLayout() -> UICollectionViewLayout {
         let spacing: CGFloat = 10
         let itemSize = NSCollectionLayoutSize(
@@ -184,35 +182,35 @@ class MainViewController: UIViewController {
     }
 }
 
-
-
-
-
-
-
-
-
-
 extension MainViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         advertisements.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell { [self]
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "productCell", for: indexPath) as? ProductCell else { return UICollectionViewCell() }
         
-        cell.layer.borderColor = UIColor.gray.cgColor
-        
         let advertisement = advertisements[indexPath.item]
         
+        var imageURLs: [URL] = []
+        
+        for advertisement in advertisements {
+            if let url = URL(string: advertisement.imageURL)  { imageURLs.append(url)
+            }
+        }
+        let imageURL = imageURLs[indexPath.row]
+        
+        cell.imageView.kf.setImage(with: imageURL)
         cell.add(title: advertisement.title)
         cell.add(price: advertisement.price)
         cell.add(location: advertisement.location)
         cell.add(createdDate: advertisement.createdDate)
         
-        cell.loadImage(from: advertisement.imageURL,
-                       placeholder: UIImage(systemName: "wifi.slash"))
+        
+        
+        //cell.loadImage(from: advertisement.imageURL,
+                      // placeholder: UIImage(systemName: "wifi.slash"))
         
         return cell
     }
