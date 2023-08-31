@@ -1,22 +1,26 @@
-//
-//  ViewController.swift
-//  avito-tech-task
-//
-//  Created by macbook on 26.08.2023.
-//
+// MARK: - Main View Controller
 
 import UIKit
 import Kingfisher
 
 class MainViewController: UIViewController {
     
-    var collectionView: UICollectionView!
+    // MARK: - Properties
+    
+    private var advertisements: [Advertisement] = []
+    private let network = AvitoAPI()
+    private var isLoading = false
+    private var isError = false
+    
+    // MARK: - UI Elements
+    
     private var activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.color = .gray
         indicator.translatesAutoresizingMaskIntoConstraints = false
         return indicator
     }()
+    
     private var errorLabel: UILabel = {
             let label = UILabel()
             label.textColor = .red
@@ -25,79 +29,22 @@ class MainViewController: UIViewController {
             return label
     }()
     
+    private var collectionView: UICollectionView!
     
-    private var isLoading = false
-    private var isError = false
-    
-    private var advertisements: [Advertisement] = []
+    // MARK: - View Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Список товаров"
-        view.backgroundColor = .white
         
-        
-        setupCollectionView()
-        setupConstaints()
+        setupUI()
         showLoadingState()
         loadData()
     }
     
-    // загрузка данных из JSON
-    func loadData() {
-        let urlString = "https://www.avito.st/s/interns-ios/main-page.json"
-        guard let url = URL(string: urlString) else {
-            showErrorState()
-            return
-        }
-        let request = URLRequest(url: url)
-        
-        URLSession.shared.dataTask(with: request) { (data, error, response) in
-            // проверка наличия ошибок
-            guard error != nil else {
-                print("Ошибка при загрузке данных: \(String(describing: error))")
-                DispatchQueue.main.async {
-                    self.errorLabel.text = "Ошибка при загрузке данных!"
-                    self.showLoadingState()
-                    self.showErrorState()
-                }
-                return
-            }
-            guard let data = data else {
-                print("Данные не получены!")
-                DispatchQueue.main.async {
-                    self.errorLabel.text = "Данные не получены!"
-                    self.showErrorState()
-                }
-                return
-            }
-            
-            do
-            {
-                let decoder = JSONDecoder()
-                let advertisements = try decoder.decode(Advertisements.self, from: data)
-                
-                for advertisement in advertisements.advertisements {
-                    self.advertisements.append(advertisement)
-                }
-                
-                DispatchQueue.main.async {
-                    self.showDataState()
-                }
-            }
-            catch
-            {
-                print("Ошибка при парсинге JSON: \(error)")
-                DispatchQueue.main.async {
-                    self.errorLabel.text = "Ошибка при обработке данных!"
-                    self.showErrorState()
-                }
-            }
-        }.resume()
-        
-    }
+    // MARK: - Conditions
     
-    func showLoadingState() {
+    private func showLoadingState() {
         isLoading = true
         isError = false
         
@@ -107,7 +54,8 @@ class MainViewController: UIViewController {
         
         activityIndicator.startAnimating()
     }
-    func showErrorState() {
+    
+    private func showErrorState() {
         isLoading = false
         isError = true
         
@@ -117,7 +65,8 @@ class MainViewController: UIViewController {
         
         activityIndicator.stopAnimating()
     }
-    func showDataState() {
+    
+    private func showDataState() {
         isLoading = false
         isError = false
         
@@ -128,45 +77,78 @@ class MainViewController: UIViewController {
         activityIndicator.stopAnimating()
         collectionView.reloadData()
     }
-    func setupCollectionView() {
+
+    // MARK: - API
+    
+    private func loadData() {
+        let urlString = "https://www.avito.st/s/interns-ios/main-page.json"
+            
+        network.fetchData(fromURL: urlString, responseType: Advertisements.self) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let advertisements):
+                    for advertisement in advertisements.advertisements {
+                        self?.advertisements.append(advertisement)
+                    }
+                    self?.showDataState()
+                    self?.collectionView.reloadData()
+                case .failure(let error):
+                    print("Error loading data: \(error)")
+                    self?.errorLabel.text = "Ошибка при загрузке данных!"
+                    self?.showErrorState()
+                }
+            }
+        }
+    }
+    
+    // MARK: - UI Setup
+
+    private func setupUI() {
+        view.backgroundColor = .white
+        activityIndicator.isHidden = true
+        errorLabel.isHidden = true
+        setupCollectionView()
+        addSubview()
+        setupConstaints()
+    }
+    
+    private func addSubview() {
+        view.addSubview(collectionView)
+        view.addSubview(activityIndicator)
+        view.addSubview(errorLabel)
+    }
+        
+    private func setupCollectionView() {
         collectionView = UICollectionView(frame: .zero,
                                           collectionViewLayout: createLayout())
-        collectionView.register(ProductCell.self,
-                                forCellWithReuseIdentifier: "productCell")
-        collectionView.delegate = self
+        collectionView.register(AdvertisementCell.self,
+                                forCellWithReuseIdentifier: "AdvertisementCell")
         collectionView.dataSource = self
-        
-        view.addSubview(collectionView)
+        collectionView.delegate = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
-        collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
     
     private func setupConstaints() {
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         
-        view.addSubview(activityIndicator)
-        view.addSubview(errorLabel)
-        
-        activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        
-        errorLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        errorLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-               
-       
-        activityIndicator.isHidden = true
-        errorLabel.isHidden = true
+            errorLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            errorLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
     }
+    
     private func createLayout() -> UICollectionViewLayout {
         let spacing: CGFloat = 10
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .absolute(320))
@@ -182,54 +164,42 @@ class MainViewController: UIViewController {
     }
 }
 
-extension MainViewController: UICollectionViewDataSource {
+
+// MARK: - UICollection Delegates
+
+extension MainViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         advertisements.count
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "productCell", for: indexPath) as? ProductCell else { return UICollectionViewCell() }
-        
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AdvertisementCell", for: indexPath) as? AdvertisementCell else { return UICollectionViewCell() }
         let advertisement = advertisements[indexPath.item]
-        
         var imageURLs: [URL] = []
-        
         for advertisement in advertisements {
-            if let url = URL(string: advertisement.imageURL)  { imageURLs.append(url)
+            if let url = URL(string: advertisement.imageURL)  {
+                imageURLs.append(url)
             }
         }
         let imageURL = imageURLs[indexPath.row]
-        
-        cell.imageView.kf.setImage(with: imageURL)
-        cell.add(title: advertisement.title)
-        cell.add(price: advertisement.price)
-        cell.add(location: advertisement.location)
-        cell.add(createdDate: advertisement.createdDate)
-        
-        
-        
-        //cell.loadImage(from: advertisement.imageURL,
-                      // placeholder: UIImage(systemName: "wifi.slash"))
+
+        cell.configure(withTitle: advertisement.title,
+                       price: advertisement.price,
+                       location: advertisement.location,
+                       imageURL: imageURL,
+                       createdDate: advertisement.createdDate)
         
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedItem = advertisements[indexPath.item]
-        
         let vc = AdvertisementDetailViewController()
-        
         vc.advertisement = selectedItem
-        
         navigationController?.pushViewController(vc, animated: true)
     }
-    
-}
 
-extension MainViewController: UICollectionViewDelegate {
-    
-    
 }
 
     

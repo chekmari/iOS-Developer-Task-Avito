@@ -1,18 +1,11 @@
-//
-//  Product.swift
-//  avito-tech-task
-//
-//  Created by macbook on 26.08.2023.
-//
+// MARK: -  Advertisement 
 
 import Foundation
 
-// MARK: - Advertisements
 struct Advertisements: Codable {
     let advertisements: [Advertisement]
 }
 
-// MARK: - Advertisement
 struct Advertisement: Codable {
     let id, title, price, location : String
     let description, email, phoneNumber, address: String?
