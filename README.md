@@ -1,5 +1,18 @@
 # Инструкция по запуску приложения
 
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/chekmari/iOS-Developer-Task-Avito/blob/main/Images/mainVC.PNG" width="300" alt="Список товаров на главном экране"><br>
+      <em>Список товаров на главном экране</em>
+    </td>
+    <td align="center">
+      <img src="https://github.com/chekmari/iOS-Developer-Task-Avito/blob/main/Images/detailsVC.PNG" width="300" alt="Детальная карточка товара"><br>
+      <em>Детальная карточка товара</em>
+    </td>
+  </tr>
+</table>
+
 Следуйте этой инструкции, чтобы успешно запустить приложение для iOS,
 разработанное в рамках тестового задания.
 
@@ -20,11 +33,8 @@ Git\](https://git-scm.com/).
 2\. Выполните следующую команду, чтобы склонировать репозиторий с GitHub
 на ваш компьютер:
 
-\`\`\`bash
-
 git clone https://github.com/chekmari/iOS-Developer-Task-Avito
 
-\`\`\`
 
 ### Шаг 3: Открытие проекта в Xcode
 
